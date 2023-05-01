@@ -52,7 +52,9 @@ const TableCalendar = styled.div`
   #body {
     min-width: 500px;
     max-height: 500px;
-    overflow: auto;
+    @media screen and (min-width: 500px) {
+      overflow: auto;
+    }
     display: flex;
   }
   #squares {
