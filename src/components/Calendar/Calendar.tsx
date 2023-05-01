@@ -34,7 +34,6 @@ const CalendarWrapper = styled.div`
 const TableCalendar = styled.div`
   width: 100%;
   display: flex;
-  max-height: 500px;
 
   flex-direction: column;
   #heading {
@@ -52,11 +51,12 @@ const TableCalendar = styled.div`
   }
   #body {
     min-width: 500px;
+    max-height: 500px;
+    overflow: auto;
     display: flex;
   }
   #squares {
     margin-top: 10px;
-
     display: grid;
     height: max-content;
     grid-template-columns: repeat(5, 1fr);
