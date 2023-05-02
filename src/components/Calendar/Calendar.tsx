@@ -8,6 +8,7 @@ export type CalendarProps = {
 };
 const CalendarWrapper = styled.div`
   width: 100%;
+  background-color: white;
   height: 100%;
   overflow: auto;
   display: flex;
@@ -101,22 +102,22 @@ export const Calendar = ({ appointments, patients }: CalendarProps) => {
             {[...Array(9).keys()].map((key) => {
               return (
                 <>
-                  <div>
+                  <div key={key + "-1"}>
                     <p id={key === 0 ? "first" : ""}>{key + 9}:00</p>
                   </div>
-                  <div>
+                  <div key={key + "-2"}>
                     <p>{key + 9}:30</p>
                   </div>
                 </>
               );
             })}
-            <div>
+            <div key={"last"}>
               <div>
                 <p id="last">18:00</p>
               </div>
             </div>
           </div>
-          <div id="squares">
+          <div id="squares" key={"squares"}>
             {[...Array(18 * 5).keys()].map((key) => {
               return <div key={key} id="subgrid"></div>;
             })}
