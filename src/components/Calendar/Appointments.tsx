@@ -1,3 +1,4 @@
+import moment from "moment";
 import styled from "styled-components";
 import { CalendarProps } from "./Calendar";
 
@@ -40,15 +41,12 @@ const Post = styled.div<{
 
 function isWithinCurrentWeek(dateToCheck: Date) {
   const today = new Date();
-  const dayOfWeek = today.getDay();
 
   const startOfWeek = new Date(
-    today.getTime() - (dayOfWeek - 1) * 24 * 60 * 60 * 1000
+    moment(today).startOf("week").add("1", "day").startOf("day").format()
   );
-  startOfWeek.setHours(0, 0, 0, 0);
 
-  const endOfWeek = new Date(startOfWeek.getTime() + 4 * 24 * 60 * 60 * 1000);
-  endOfWeek.setHours(23, 59, 59, 999);
+  const endOfWeek = new Date(moment(today).endOf("week").endOf("day").format());
 
   return dateToCheck >= startOfWeek && dateToCheck <= endOfWeek;
 }
@@ -58,13 +56,12 @@ export const Appointments = ({ appointments, patients }: CalendarProps) => {
     <>
       {appointments.map((appointment) => {
         const startTime = new Date(appointment.startTime);
-        const provisoryTime = new Date(startTime.getTime() + 30 * 60 * 1000);
+        const provisoryTime = new Date(
+          moment(appointment.startTime).add(30, "minutes").format()
+        );
         const endTime = new Date(appointment.endTime || provisoryTime);
         const startOfDay = new Date(
-          startTime.getFullYear(),
-          startTime.getMonth(),
-          startTime.getDate(),
-          9
+          moment(startTime).startOf("day").add("9", "hours").format()
         );
         const colStart = startTime.getDay();
         const colEnd = endTime.getDay() + 1;
