@@ -22,7 +22,10 @@ const StatusTag = styled.p<{ status: string }>`
   font-family: Inter;
   width: 100px;
   height: 30px;
-  display: flex;
+  display: none;
+  @media screen and (min-width: 500px) {
+    display: flex;
+  }
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -50,21 +53,37 @@ const LineAppointment = styled.div`
   width: 100%;
   max-width: 1800px;
   align-items: center;
-  padding: 10px 50px;
   margin: auto;
   display: flex;
   justify-content: space-between;
 `;
 const Specialty = styled.p`
+  display: none;
+
+  @media screen and (min-width: 800px) {
+    display: flex;
+  }
   font-weight: 500;
   width: 200px;
 `;
 
 const Name = styled.p`
   font-weight: 700;
+  margin-left: 10px;
+  @media screen and (min-width: 800px) {
+    margin-left: 30px;
+  }
   width: 200px;
 `;
 const Type = styled.p<{ type: string }>`
+  margin-right: 10px;
+  display: none;
+
+  @media screen and (min-width: 800px) {
+    display: flex;
+    margin-right: 30px;
+  }
+
   background-color: ${(props) =>
     props.type === "surgery"
       ? "#e74d3c50"
@@ -89,7 +108,6 @@ const Type = styled.p<{ type: string }>`
 
   width: 100px;
   height: 30px;
-  display: flex;
   justify-content: center;
   align-items: center;
   text-align: center;
