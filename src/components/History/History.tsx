@@ -1,4 +1,5 @@
 import moment from "moment";
+import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
 
@@ -68,6 +69,10 @@ const Specialty = styled.p`
 `;
 
 const Name = styled.p`
+  cursor: pointer;
+  :hover {
+    text-decoration: underline;
+  }
   font-weight: 700;
   margin-left: 10px;
   @media screen and (min-width: 800px) {
@@ -121,6 +126,7 @@ const Time = styled.p`
 `;
 
 const History = ({ appointments, patients }: HistoryProps) => {
+  const navigate = useNavigate();
   const getPatientName = (id: number) => {
     return (
       patients &&
@@ -151,7 +157,11 @@ const History = ({ appointments, patients }: HistoryProps) => {
         {pastAppointments.map((appointment) => {
           return (
             <LineAppointment key={appointment.id}>
-              <Name>{getPatientName(appointment.patientId)}</Name>
+              <Name
+                onClick={() => navigate(`/patient/${appointment.patientId}`)}
+              >
+                {getPatientName(appointment.patientId)}{" "}
+              </Name>
               <Specialty>{SpecialtyString[appointment.specialty]}</Specialty>
               <Time>
                 {getFormattedDate(appointment.startTime)}{" "}
