@@ -35,11 +35,43 @@ const patients: Patient[] = [
   },
 ];
 
+const appointmentsOutOfTime: Appointment[] = [
+  {
+    id: 1,
+    specialty: Specialty.Cardiology,
+    patientId: 1,
+    type: AppointmentType.CheckUp,
+    description: "Its a description",
+    status: Status.Pending,
+    startTime: moment().hours(5).minutes(0).toISOString(),
+    endTime: null,
+    notes: "Its a note",
+  },
+  {
+    id: 2,
+    specialty: Specialty.Cardiology,
+    patientId: 1,
+    type: AppointmentType.CheckUp,
+    description: "Its a description",
+    status: Status.Pending,
+    startTime: moment().startOf("week").subtract(1, "day").toISOString(),
+    endTime: null,
+    notes: "Its a note",
+  },
+];
+
 describe("Calendar component tests", () => {
   test("renders without crashing", () => {
     render(<Calendar appointments={appointments} patients={patients} />);
     const appointmentsOnScreen = screen.queryAllByTestId("appointment");
 
     expect(appointmentsOnScreen).toHaveLength(appointments.length);
+  });
+  test("doesnt render appointments that are out of 9h--18h or out of the current week", () => {
+    render(
+      <Calendar appointments={appointmentsOutOfTime} patients={patients} />
+    );
+    const appointmentsOnScreen = screen.queryAllByTestId("appointment");
+    expect(appointmentsOnScreen).toHaveLength(0);
   });
 });

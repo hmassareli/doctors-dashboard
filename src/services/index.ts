@@ -7,7 +7,7 @@ const url = "https://cm42-medical-dashboard.herokuapp.com/";
 
 const api = axios.create({
   baseURL: url,
-  timeout: 1000,
+  timeout: 4000,
   headers: {},
 });
 
