@@ -19,23 +19,22 @@ const Wrapper = styled.div`
 `;
 const BasicInfoWrapper = styled.div`
   display: flex;
+  flex-wrap: wrap;
   gap: 10px;
-  margin-top: 20px;
+  margin-block: 20px;
   margin-inline: 20px;
-  height: 150px;
+
+  div {
+    min-height: 100px;
+  }
 `;
 const Content = styled.div`
-  width: 80%;
-  max-width: 1800px;
+  flex: 1 1 0px;
   display: flex;
   flex-direction: column;
   background-color: #eef0f3;
 `;
-const Navbar = styled.div`
-  width: 20%;
-  height: 700px;
-  background-color: white;
-`;
+
 const PatientInfo = styled.div`
   flex: 1 1 0px;
   border-radius: 10px;
@@ -173,9 +172,6 @@ const Patient = () => {
 
   return (
     <Wrapper>
-      <Navbar>
-        <div></div>
-      </Navbar>
       <Content>
         <BasicInfoWrapper>
           <PatientInfo>

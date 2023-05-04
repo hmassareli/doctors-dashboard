@@ -23,14 +23,15 @@ enum SpecialtyString {
   neurology = "Neurology",
   general = "General",
 }
-const StatusTag = styled.p<{ status: string }>`
+const StatusTag = styled.p<{ status: string; alwaysShow?: boolean }>`
   font-family: Inter;
   width: 100px;
   height: 30px;
-  display: none;
+  display: ${(props) => (props.alwaysShow ? "flex" : "none")};
   @media screen and (min-width: 500px) {
     display: flex;
   }
+  margin-right: 10px;
   justify-content: center;
   align-items: center;
   text-align: center;
@@ -128,6 +129,7 @@ const Type = styled.p<{ type: string }>`
   border-radius: 5px;
 `;
 const Time = styled.p`
+  margin-left: 20px;
   color: gray;
   font-weight: 400;
   font-weight: 500;
@@ -189,7 +191,10 @@ const History = ({
                 {getFormattedDate(appointment.startTime)}{" "}
                 {getFormattedHours(appointment.startTime)}
               </Time>
-              <StatusTag status={appointment.status}>
+              <StatusTag
+                status={appointment.status}
+                alwaysShow={patients.length === 1}
+              >
                 {appointment.status}
               </StatusTag>
 
