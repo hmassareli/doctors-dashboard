@@ -1,6 +1,8 @@
 import axios from "axios";
 import { Appointment, Patient } from "../../types/index";
 
+// Make a specific query retry a certain number of times
+
 const url = "https://cm42-medical-dashboard.herokuapp.com/";
 
 const api = axios.create({

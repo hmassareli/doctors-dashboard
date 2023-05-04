@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import moment from "moment";
 import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
@@ -153,16 +154,30 @@ const Patient = () => {
 
   const params = useParams();
   const { id } = params;
-  useEffect(() => {
-    if (!id) return;
-    getPatient(id).then((data) => setPatient(data));
-    getAppointments().then((data) => {
+  const patientMutation = useMutation({
+    mutationFn: () => getPatient(id || ""),
+    retry: true,
+    retryDelay: 500,
+    onSuccess: (data) => {
+      setPatient(data);
+    },
+  });
+  const appointmentMutation = useMutation({
+    mutationFn: () => getAppointments(),
+    retry: true,
+    retryDelay: 500,
+    onSuccess: (data) => {
       const appointments = data.filter((app) => {
         return `${app.patientId}` === id;
       });
-
       setAppointmentsFromPatient(appointments);
-    });
+    },
+  });
+
+  useEffect(() => {
+    if (!id) return;
+    patientMutation.mutate();
+    appointmentMutation.mutate();
   }, [id]);
 
   useEffect(() => {

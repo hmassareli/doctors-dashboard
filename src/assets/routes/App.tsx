@@ -1,3 +1,4 @@
+import { useMutation } from "@tanstack/react-query";
 import { useEffect, useState } from "react";
 import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
@@ -48,13 +49,26 @@ const App = () => {
     return appointment.status !== "pending";
   });
 
-  useEffect(() => {
-    getAppointments().then((data) => {
-      setAppointments(data);
-    });
-    getPatients().then((data) => {
+  const patientMutation = useMutation({
+    mutationFn: () => getPatients(),
+    retry: true,
+    retryDelay: 500,
+    onSuccess: (data) => {
       setPatients(data);
-    });
+    },
+  });
+  const appointmentMutation = useMutation({
+    mutationFn: () => getAppointments(),
+    retry: true,
+    retryDelay: 500,
+    onSuccess: (data) => {
+      setAppointments(data);
+    },
+  });
+
+  useEffect(() => {
+    patientMutation.mutate();
+    appointmentMutation.mutate();
   }, []);
   return (
     <Wrapper>
