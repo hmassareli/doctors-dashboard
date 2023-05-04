@@ -3,6 +3,7 @@ import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
 import Calendar from "../../components/Calendar";
 import History from "../../components/History";
+import PatientsList from "../../components/PatientsList";
 import { getAppointments, getPatients } from "../../services";
 
 const Wrapper = styled.div`
@@ -10,6 +11,32 @@ const Wrapper = styled.div`
   flex-direction: column;
   background-color: #eef0f3;
   font-family: Inter;
+  padding: 50px;
+
+  @media screen and (max-width: 800px) {
+    padding-inline: 0px;
+  }
+  .calendar-wrapper {
+    margin-inline: 20px;
+  }
+  h2 {
+    margin-block: 30px;
+    font-size: 20px;
+  }
+  .dashboard {
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 40px;
+  }
+`;
+const InfoWrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  padding: 20px;
+  gap: 20px;
+  & > div {
+    flex: 1 1 0px;
+  }
 `;
 
 const App = () => {
@@ -31,9 +58,20 @@ const App = () => {
   }, []);
   return (
     <Wrapper>
-      <Calendar appointments={appointments} patients={patients} />
-      <h1>History</h1>
-      <History appointments={pastAppointments} patients={patients} />
+      <div className="calendar-wrapper">
+        <h1 className="dashboard">Dashboard</h1>
+        <Calendar appointments={appointments} patients={patients} />
+      </div>
+      <InfoWrapper>
+        <div>
+          <h2>Patients</h2>
+          <PatientsList patients={patients} />
+        </div>
+        <div>
+          <h2>History</h2>
+          <History appointments={pastAppointments} patients={patients} />
+        </div>
+      </InfoWrapper>
     </Wrapper>
   );
 };

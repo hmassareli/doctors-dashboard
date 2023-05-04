@@ -7,6 +7,15 @@ export type CalendarProps = {
   patients: Patient[];
 };
 const CalendarWrapper = styled.div`
+  border-radius: 10px;
+  padding-inline: 30px;
+  display: flex;
+  flex-direction: column;
+  .title {
+    font-size: 20px;
+    font-weight: 700;
+    margin-block: 30px;
+  }
   width: 100%;
   background-color: white;
   height: 100%;
@@ -79,6 +88,7 @@ const TableCalendar = styled.div`
 export const Calendar = ({ appointments, patients }: CalendarProps) => {
   return (
     <CalendarWrapper>
+      <p className="title">Calendar</p>
       <TableCalendar>
         <div id="heading">
           <div>
