@@ -1,7 +1,6 @@
-import { useMutation } from "@tanstack/react-query";
-import { useEffect, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
 import styled from "styled-components";
-import { Appointment, Patient } from "../../../types";
+import { Patient } from "../../../types";
 import Calendar from "../../components/Calendar";
 import History from "../../components/History";
 import PatientsList from "../../components/PatientsList";
@@ -41,49 +40,42 @@ const InfoWrapper = styled.div`
 `;
 
 const App = () => {
-  const [appointments, setAppointments] = useState<Appointment[] | []>([]);
-  const [patients, setPatients] = useState<Patient[] | []>([]);
+  const { data: patients } = useQuery<Patient[]>(["patients"], getPatients, {
+    retry: true,
+    retryDelay: 500,
+  });
+  const typeSafePatients = patients || [];
 
-  const pastAppointments = appointments.filter((appointment) => {
-    if (patients.length === 1) return true;
+  const { data: appointments } = useQuery(["appointment"], getAppointments, {
+    retry: true,
+    retryDelay: 500,
+  });
+
+  const pastAppointments = (appointments || []).filter((appointment) => {
+    if ((patients || []).length === 1) return true;
     return appointment.status !== "pending";
   });
 
-  const patientMutation = useMutation({
-    mutationFn: () => getPatients(),
-    retry: true,
-    retryDelay: 500,
-    onSuccess: (data) => {
-      setPatients(data);
-    },
-  });
-  const appointmentMutation = useMutation({
-    mutationFn: () => getAppointments(),
-    retry: true,
-    retryDelay: 500,
-    onSuccess: (data) => {
-      setAppointments(data);
-    },
-  });
-
-  useEffect(() => {
-    patientMutation.mutate();
-    appointmentMutation.mutate();
-  }, []);
   return (
     <Wrapper>
       <div className="calendar-wrapper">
         <h1 className="dashboard">Dashboard</h1>
-        <Calendar appointments={appointments} patients={patients} />
+        <Calendar
+          appointments={appointments || []}
+          patients={typeSafePatients}
+        />
       </div>
       <InfoWrapper>
         <div>
           <h2>Patients</h2>
-          <PatientsList patients={patients} />
+          <PatientsList patients={typeSafePatients} />
         </div>
         <div>
           <h2>History</h2>
-          <History appointments={pastAppointments} patients={patients} />
+          <History
+            appointments={pastAppointments}
+            patients={typeSafePatients}
+          />
         </div>
       </InfoWrapper>
     </Wrapper>

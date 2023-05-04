@@ -1,9 +1,8 @@
-import { useMutation } from "@tanstack/react-query";
+import { useQuery } from "@tanstack/react-query";
 import moment from "moment";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
-import { Appointment, Patient as PatientType } from "../../../types";
 import History from "../../components/History";
 import { getAppointments, getPatient } from "../../services";
 import {
@@ -142,58 +141,36 @@ const LatestAppointmentTitle = PatientInfoTitle;
 const LatestAppointmentWrapper = PlanWrapper;
 
 const Patient = () => {
-  const [patient, setPatient] = useState<PatientType | undefined>();
-  const [appointmentsFromPatient, setAppointmentsFromPatient] = useState<
-    Appointment[] | []
-  >([]);
-  const [appointmentsByPeriod, setAppointmentsByPeriod] = useState<
-    Appointment[]
-  >([]);
-
   const [periodSelected, setPeriodSelected] = useState<number>(0);
 
   const params = useParams();
   const { id } = params;
-  const patientMutation = useMutation({
-    mutationFn: () => getPatient(id || ""),
+  const { data: appointments } = useQuery(
+    ["appointments"],
+    () => getAppointments(),
+    {
+      retry: true,
+      retryDelay: 500,
+    }
+  );
+
+  const { data: patient } = useQuery(["patient"], () => getPatient(id || ""), {
     retry: true,
     retryDelay: 500,
-    onSuccess: (data) => {
-      setPatient(data);
-    },
-  });
-  const appointmentMutation = useMutation({
-    mutationFn: () => getAppointments(),
-    retry: true,
-    retryDelay: 500,
-    onSuccess: (data) => {
-      const appointments = data.filter((app) => {
-        return `${app.patientId}` === id;
-      });
-      setAppointmentsFromPatient(appointments);
-    },
   });
 
-  useEffect(() => {
-    if (!id) return;
-    patientMutation.mutate();
-    appointmentMutation.mutate();
-  }, [id]);
+  const appointmentsFromPatient =
+    appointments?.filter((app) => `${app.patientId}` === id) || [];
 
-  useEffect(() => {
-    setAppointmentsByPeriod(
-      appointmentsFromPatient.filter((app) => {
-        if (periodSelected === 0)
-          return (
-            moment(app.startTime).isAfter(moment().subtract(10, "days")) &&
-            moment(app.startTime).isBefore(moment())
-          );
-        if (periodSelected === 1)
-          return moment(app.startTime).isAfter(moment());
-        return moment(app.startTime).isBefore(moment());
-      })
-    );
-  }, [periodSelected, appointmentsFromPatient]);
+  const appointmentsByPeriod = appointmentsFromPatient?.filter((app) => {
+    if (periodSelected === 0)
+      return (
+        moment(app.startTime).isAfter(moment().subtract(10, "days")) &&
+        moment(app.startTime).isBefore(moment())
+      );
+    if (periodSelected === 1) return moment(app.startTime).isAfter(moment());
+    return moment(app.startTime).isBefore(moment());
+  });
 
   const age = moment().diff(patient?.birthday || "", "years");
 
