@@ -64,7 +64,7 @@ const TableCalendar = styled.div`
     height: max-content;
     grid-template-columns: repeat(5, 1fr);
     grid-template-rows: repeat(18, 60px);
-    width: 100%;
+    width: calc(100% - 75px);
     gap: 1px;
     position: relative;
     background-color: #dbd9d9;
