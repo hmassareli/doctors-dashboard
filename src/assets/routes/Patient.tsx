@@ -1,6 +1,6 @@
 import moment from "moment";
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { Link, useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Appointment, Patient as PatientType } from "../../../types";
 import History from "../../components/History";
@@ -33,6 +33,18 @@ const Content = styled.div`
   display: flex;
   flex-direction: column;
   background-color: #eef0f3;
+  .back-home {
+    display: flex;
+    justify-content: center;
+    margin-top: 30px;
+    text-decoration: none;
+    font-family: Inter;
+    color: #0070f3;
+    font-weight: 600;
+    :hover {
+      text-decoration: underline;
+    }
+  }
 `;
 
 const PatientInfo = styled.div`
@@ -239,6 +251,11 @@ const Patient = () => {
             </div>
           </AppointmentDetailsWrapper>
         </HistoryWrapper>
+
+        <Link className="back-home" to="/">
+          {" "}
+          Go back to Home
+        </Link>
       </Content>
     </Wrapper>
   );
