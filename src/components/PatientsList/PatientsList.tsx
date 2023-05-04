@@ -64,7 +64,7 @@ const PatientsList = ({ patients, perPage = 10 }: Props) => {
       <PatientsWrapper>
         {visiblePatients.map((patient) => {
           return (
-            <div key={patient.id}>
+            <div data-testid="patient" key={patient.id}>
               <p
                 className="name"
                 onClick={() => navigate(`/patient/${patient.id}`)}

@@ -1,3 +1,4 @@
+import React from "react";
 import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
 import { Appointments } from "./Appointments";
@@ -111,14 +112,14 @@ export const Calendar = ({ appointments, patients }: CalendarProps) => {
           <div id="times">
             {[...Array(9).keys()].map((key) => {
               return (
-                <>
-                  <div key={key + "-1"}>
+                <React.Fragment key={key}>
+                  <div>
                     <p id={key === 0 ? "first" : ""}>{key + 9}:00</p>
                   </div>
-                  <div key={key + "-2"}>
+                  <div>
                     <p>{key + 9}:30</p>
                   </div>
-                </>
+                </React.Fragment>
               );
             })}
             <div key={"last"}>

@@ -85,6 +85,7 @@ export const Appointments = ({ appointments, patients }: CalendarProps) => {
         }
         return (
           <Post
+            data-testid="appointment"
             rowStart={rowStart}
             rowEnd={rowEnd}
             colStart={colStart}

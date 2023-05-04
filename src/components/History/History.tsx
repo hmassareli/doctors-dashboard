@@ -177,7 +177,10 @@ const History = ({
       <HistoryContainer>
         {visibleApppointments.map((appointment) => {
           return (
-            <LineAppointment key={appointment.id}>
+            <LineAppointment
+              key={appointment.id}
+              data-testid="line-appointment"
+            >
               <Name
                 hideName={hideName}
                 onClick={() => navigate(`/patient/${appointment.patientId}`)}
