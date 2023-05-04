@@ -60,8 +60,8 @@ const PaginationContainer = styled.div`
   }
 
   .pagination {
-    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
     border-radius: 5px;
+    background-color: white;
     li.selected {
       background-color: #1abc9c;
       border-radius: 5px;
