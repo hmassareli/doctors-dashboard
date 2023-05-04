@@ -1,10 +1,10 @@
-import moment from "moment";
 import { useEffect, useState } from "react";
 import ReactPaginate from "react-paginate";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
 import arrowLeft from "../../assets/icons/arrow-left.svg";
+import { getFormattedDate, getFormattedHours } from "../../utils";
 
 type HistoryProps = {
   appointments: Appointment[] | [];
@@ -206,12 +206,6 @@ const History = ({
         return patient.id === id;
       })?.name
     );
-  };
-  const getFormattedDate = (date: string) => {
-    return moment(date).format("ll");
-  };
-  const getFormattedHours = (date: string) => {
-    return moment(date).format("HH:mm");
   };
 
   return (

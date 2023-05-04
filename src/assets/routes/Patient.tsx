@@ -9,6 +9,7 @@ import {
   capitalizeFirstLetter,
   formatCpfWithsymbols,
   formatHealthSystem,
+  getFormattedDate,
 } from "../../utils";
 
 const Wrapper = styled.div`
@@ -19,12 +20,15 @@ const Wrapper = styled.div`
 const BasicInfoWrapper = styled.div`
   display: flex;
   gap: 10px;
-  margin-top: 50px;
+  margin-top: 20px;
   margin-inline: 20px;
-  height: 300px;
+  height: 150px;
 `;
 const Content = styled.div`
   width: 80%;
+  max-width: 1800px;
+  display: flex;
+  flex-direction: column;
   background-color: #eef0f3;
 `;
 const Navbar = styled.div`
@@ -66,6 +70,58 @@ const PlanWrapper = styled.div`
   padding: 10px;
   height: 100px;
 `;
+const HistoryPeriod = styled.div`
+  height: 50px;
+  background-color: #eef0f3;
+  width: 100%;
+  display: flex;
+  gap: 10px;
+  justify-content: start;
+`;
+const PeriodOption = styled.div<{ selected: boolean }>`
+  font-weight: 500;
+  cursor: pointer;
+  display: flex;
+  border-radius: 5px 5px 0px 0px;
+  background-color: ${(props) => (props.selected ? "white" : "#d9dbdc")};
+  align-items: center;
+  width: 100px;
+  justify-content: center;
+  height: 100%;
+`;
+const HistoryWrapper = styled.div`
+  margin-inline: 20px;
+  border-radius: 10px;
+  overflow: hidden;
+  background-color: white;
+`;
+const AppointmentDetailsWrapper = styled.div`
+  display: flex;
+  flex-direction: column;
+  margin-inline: 30px;
+  margin-block: 20px;
+
+  .doctor-says {
+    margin: 10px 0px;
+    font-weight: bold;
+    font-size: 14px;
+    p {
+      font-size: 14px;
+      font-weight: 500;
+      margin-left: 10px;
+    }
+  }
+`;
+const AppointmentDetails = styled.div`
+  .title {
+    font-weight: bold;
+  }
+  p {
+    font-size: 14px;
+  }
+  display: flex;
+  justify-content: space-between;
+`;
 
 const PlanInfoTitle = PatientInfoTitle;
 const InsurancePlan = PatientName;
@@ -78,6 +134,11 @@ const Patient = () => {
   const [appointmentsFromPatient, setAppointmentsFromPatient] = useState<
     Appointment[] | []
   >([]);
+  const [appointmentsByPeriod, setAppointmentsByPeriod] = useState<
+    Appointment[]
+  >([]);
+
+  const [periodSelected, setPeriodSelected] = useState<number>(0);
 
   const params = useParams();
   const { id } = params;
@@ -92,6 +153,21 @@ const Patient = () => {
       setAppointmentsFromPatient(appointments);
     });
   }, [id]);
+
+  useEffect(() => {
+    setAppointmentsByPeriod(
+      appointmentsFromPatient.filter((app) => {
+        if (periodSelected === 0)
+          return (
+            moment(app.startTime).isAfter(moment().subtract(10, "days")) &&
+            moment(app.startTime).isBefore(moment())
+          );
+        if (periodSelected === 1)
+          return moment(app.startTime).isAfter(moment());
+        return moment(app.startTime).isBefore(moment());
+      })
+    );
+  }, [periodSelected, appointmentsFromPatient]);
 
   const age = moment().diff(patient?.birthday || "", "years");
 
@@ -129,13 +205,44 @@ const Patient = () => {
             </p>
           </LatestAppointmentWrapper>
         </BasicInfoWrapper>
-        <div>
+        <HistoryWrapper>
+          <HistoryPeriod>
+            <PeriodOption
+              onClick={() => setPeriodSelected(0)}
+              selected={periodSelected === 0}
+            >
+              Recent
+            </PeriodOption>
+            <PeriodOption
+              onClick={() => setPeriodSelected(1)}
+              selected={periodSelected === 1}
+            >
+              Upcoming
+            </PeriodOption>
+            <PeriodOption
+              onClick={() => setPeriodSelected(2)}
+              selected={periodSelected === 2}
+            >
+              History
+            </PeriodOption>
+          </HistoryPeriod>
+
           <History
-            appointments={appointmentsFromPatient}
+            appointments={appointmentsByPeriod}
             patients={patient ? [patient] : []}
             hideName
           />
-        </div>
+          <AppointmentDetailsWrapper>
+            <AppointmentDetails>
+              <p className="title">Appointment Details</p>
+              <p>{getFormattedDate(appointmentsByPeriod[0]?.startTime)}</p>
+            </AppointmentDetails>
+            <div className="doctor-says">
+              Doctor Says
+              <p>{appointmentsByPeriod[0]?.notes}</p>
+            </div>
+          </AppointmentDetailsWrapper>
+        </HistoryWrapper>
       </Content>
     </Wrapper>
   );
