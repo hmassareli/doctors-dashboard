@@ -3,7 +3,13 @@ import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import styled from "styled-components";
 import { Appointment, Patient as PatientType } from "../../../types";
+import History from "../../components/History";
 import { getAppointments, getPatient } from "../../services";
+import {
+  capitalizeFirstLetter,
+  formatCpfWithsymbols,
+  formatHealthSystem,
+} from "../../utils";
 
 const Wrapper = styled.div`
   display: flex;
@@ -13,7 +19,8 @@ const Wrapper = styled.div`
 const BasicInfoWrapper = styled.div`
   display: flex;
   gap: 10px;
-  width: 100%;
+  margin-top: 50px;
+  margin-inline: 20px;
   height: 300px;
 `;
 const Content = styled.div`
@@ -26,9 +33,9 @@ const Navbar = styled.div`
   background-color: white;
 `;
 const PatientInfo = styled.div`
+  flex: 1 1 0px;
   border-radius: 10px;
   background-color: white;
-  width: 400px;
   height: 100px;
   display: flex;
   flex-direction: column;
@@ -50,13 +57,13 @@ const DocumentWrapper = styled.div`
   justify-content: space-between;
 `;
 const PlanWrapper = styled.div`
+  flex: 1 1 0px;
   border-radius: 10px;
   background-color: white;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
   padding: 10px;
-  width: 400px;
   height: 100px;
 `;
 
@@ -71,15 +78,7 @@ const Patient = () => {
   const [appointmentsFromPatient, setAppointmentsFromPatient] = useState<
     Appointment[] | []
   >([]);
-  const formatCpfWithsymbols = (cpf: string) => {
-    return cpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, "$1.$2.$3-$4");
-  };
-  const formatHealthSystem = (healthSystemId: string) => {
-    return healthSystemId.replace(/(\d{3})(\d{3})(\d{4})/, "$1.$2/$3");
-  };
-  const capitalizeFirstLetter = (string: string) => {
-    return string.charAt(0).toUpperCase() + string.slice(1);
-  };
+
   const params = useParams();
   const { id } = params;
   useEffect(() => {
@@ -89,15 +88,13 @@ const Patient = () => {
       const appointments = data.filter((app) => {
         return `${app.patientId}` === id;
       });
-      const sortedAppointments = appointments.sort((a, b) => {
-        return (
-          new Date(b.startTime).getTime() - new Date(a.startTime).getTime()
-        );
-      });
-      setAppointmentsFromPatient(sortedAppointments);
+
+      setAppointmentsFromPatient(appointments);
     });
   }, [id]);
+
   const age = moment().diff(patient?.birthday || "", "years");
+
   return (
     <Wrapper>
       <Navbar>
@@ -121,7 +118,9 @@ const Patient = () => {
           <LatestAppointmentWrapper>
             <LatestAppointmentTitle>Latest App.</LatestAppointmentTitle>
             <Specialty>
-              {capitalizeFirstLetter(appointmentsFromPatient[0]?.specialty)}
+              {capitalizeFirstLetter(
+                appointmentsFromPatient[0]?.specialty || ""
+              )}
             </Specialty>
             <p>
               {moment(appointmentsFromPatient[0]?.startTime).format(
@@ -130,6 +129,13 @@ const Patient = () => {
             </p>
           </LatestAppointmentWrapper>
         </BasicInfoWrapper>
+        <div>
+          <History
+            appointments={appointmentsFromPatient}
+            patients={patient ? [patient] : []}
+            hideName
+          />
+        </div>
       </Content>
     </Wrapper>
   );

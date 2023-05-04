@@ -16,6 +16,11 @@ const App = () => {
   const [appointments, setAppointments] = useState<Appointment[] | []>([]);
   const [patients, setPatients] = useState<Patient[] | []>([]);
 
+  const pastAppointments = appointments.filter((appointment) => {
+    if (patients.length === 1) return true;
+    return appointment.status !== "pending";
+  });
+
   useEffect(() => {
     getAppointments().then((data) => {
       setAppointments(data);
@@ -27,7 +32,8 @@ const App = () => {
   return (
     <Wrapper>
       <Calendar appointments={appointments} patients={patients} />
-      <History appointments={appointments} patients={patients} />
+      <h1>History</h1>
+      <History appointments={pastAppointments} patients={patients} />
     </Wrapper>
   );
 };

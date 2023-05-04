@@ -1,11 +1,16 @@
 import moment from "moment";
+import { useEffect, useState } from "react";
+import ReactPaginate from "react-paginate";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { Appointment, Patient } from "../../../types";
+import arrowLeft from "../../assets/icons/arrow-left.svg";
 
 type HistoryProps = {
-  appointments: Appointment[];
+  appointments: Appointment[] | [];
   patients: Patient[];
+  hideName?: boolean;
+  perPage?: number;
 };
 enum TypeString {
   surgery = "surgery",
@@ -36,8 +41,48 @@ const StatusTag = styled.p<{ status: string }>`
       ? "#e74c3c"
       : props.status === "completed"
       ? "#1abc9c"
+      : props.status === "pending"
+      ? "orange"
       : "#838383"};
   border-radius: 100px;
+`;
+const PaginationContainer = styled.div`
+  margin-top: 10px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 2px;
+  .page-number {
+    display: flex;
+    .arrowRight {
+      transform: rotate(180deg);
+    }
+  }
+
+  .pagination {
+    box-shadow: 0px 5px 5px rgba(0, 0, 0, 0.25);
+    border-radius: 5px;
+    li.selected {
+      background-color: #1abc9c;
+      border-radius: 5px;
+      color: white;
+    }
+    display: flex;
+    list-style-type: none;
+  }
+  .pagination li {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+
+    width: 30px;
+    height: 30px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    background-color: white;
+  }
 `;
 const HistoryContainer = styled.div`
   width: 100%;
@@ -58,21 +103,23 @@ const LineAppointment = styled.div`
   display: flex;
   justify-content: space-between;
 `;
-const Specialty = styled.p`
+const Specialty = styled.p<{ hideName?: boolean }>`
   display: none;
 
   @media screen and (min-width: 800px) {
     display: flex;
   }
+  margin-left: ${(props) => (props.hideName ? "30px" : "0px")};
   font-weight: 500;
   width: 200px;
 `;
 
-const Name = styled.p`
+const Name = styled.p<{ hideName?: boolean }>`
   cursor: pointer;
   :hover {
     text-decoration: underline;
   }
+  display: ${(props) => (props.hideName ? "none" : "flex")};
   font-weight: 700;
   margin-left: 10px;
   @media screen and (min-width: 800px) {
@@ -125,8 +172,33 @@ const Time = styled.p`
   width: 200px;
 `;
 
-const History = ({ appointments, patients }: HistoryProps) => {
+const History = ({
+  appointments,
+  patients,
+  hideName,
+  perPage = 10,
+}: HistoryProps) => {
+  const [currentPage, setCurrentPage] = useState(1);
+
+  const [visibleApppointments, setVisibleApppointments] = useState<
+    Appointment[]
+  >([]);
   const navigate = useNavigate();
+  const sortedAppointments = appointments.sort((a, b) => {
+    return new Date(b.startTime).getTime() - new Date(a.startTime).getTime();
+  });
+
+  useEffect(() => {
+    const indexOfLastPost = currentPage * perPage;
+    const indexOfFirstPost = indexOfLastPost - perPage;
+    setVisibleApppointments(
+      sortedAppointments.slice(indexOfFirstPost, indexOfLastPost)
+    );
+  }, [currentPage, perPage, sortedAppointments]);
+
+  const paginate = ({ selected }: { selected: number }) => {
+    setCurrentPage(selected + 1);
+  };
   const getPatientName = (id: number) => {
     return (
       patients &&
@@ -142,27 +214,21 @@ const History = ({ appointments, patients }: HistoryProps) => {
     return moment(date).format("HH:mm");
   };
 
-  const pastAppointments = appointments
-    .filter((appointment) => {
-      return appointment.status !== "pending";
-    })
-    .sort(
-      (a, b) => moment(b.startTime).valueOf() - moment(a.startTime).valueOf()
-    );
-
   return (
     <>
-      <h1>History</h1>
       <HistoryContainer>
-        {pastAppointments.map((appointment) => {
+        {visibleApppointments.map((appointment) => {
           return (
             <LineAppointment key={appointment.id}>
               <Name
+                hideName={hideName}
                 onClick={() => navigate(`/patient/${appointment.patientId}`)}
               >
                 {getPatientName(appointment.patientId)}{" "}
               </Name>
-              <Specialty>{SpecialtyString[appointment.specialty]}</Specialty>
+              <Specialty hideName={hideName}>
+                {SpecialtyString[appointment.specialty]}
+              </Specialty>
               <Time>
                 {getFormattedDate(appointment.startTime)}{" "}
                 {getFormattedHours(appointment.startTime)}
@@ -178,6 +244,35 @@ const History = ({ appointments, patients }: HistoryProps) => {
           );
         })}
       </HistoryContainer>
+      <PaginationContainer>
+        <ReactPaginate
+          onPageChange={paginate}
+          pageCount={Math.ceil(appointments.length / perPage)}
+          previousLabel={
+            <img
+              src={arrowLeft}
+              alt="left arrow"
+              width={25}
+              height={25}
+              className="arrowLeft"
+            />
+          }
+          nextLabel={
+            <img
+              src={arrowLeft}
+              alt="right arrow"
+              width={25}
+              height={25}
+              className="arrowRight"
+            />
+          }
+          containerClassName={"pagination"}
+          pageLinkClassName={"page-number"}
+          previousLinkClassName={"page-number"}
+          nextLinkClassName={"page-number"}
+          activeLinkClassName={"active"}
+        />
+      </PaginationContainer>
     </>
   );
 };
